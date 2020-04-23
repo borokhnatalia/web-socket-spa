@@ -12,7 +12,6 @@ export class App extends React.Component {
     };
   }
 
-
   handleCheckLogin = async (username, password) => {
     for (let i = 0; i < 4; i++) {
       try {
@@ -24,9 +23,10 @@ export class App extends React.Component {
         i = 4;
       } catch (error) {
         if (error.message.includes('401')) {
-          this.setState({ error: true, errorMessage:"Wrong username or password" });
-        }else if(i===3){
-          this.setState({errorMessage:"Server error. Please try again late", error:true});
+          this.setState({ error: true, errorMessage: "Wrong username or password" });
+          i = 4;
+        } else if (i === 3) {
+          this.setState({ errorMessage: "Server error. Please try again late", error: true });
         }
       }
     }

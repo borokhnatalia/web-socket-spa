@@ -43,6 +43,10 @@ export class DataPage extends React.Component {
         }
     }
 
+    componentWillUnmount = () => {
+        this.state.socket.close();
+    }
+
     render() {
         return (
             <div className="data-container">
