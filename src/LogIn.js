@@ -1,12 +1,12 @@
 import * as React from "react";
 
-export class LogIn extends React.Component {
+export default class LogIn extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            username:"",
-            password:""
+            username: "",
+            password: ""
         };
     }
 
@@ -14,8 +14,8 @@ export class LogIn extends React.Component {
         this.setState({ [e.currentTarget.id]: e.currentTarget.value });
     }
 
-    handleKeyPress=(e)=>{
-        if(e.keyCode===13){
+    handleKeyPress = (e) => {
+        if (e.keyCode === 13) {
             this.props.handleCheckLogin(this.state.username, this.state.password);
         }
     }

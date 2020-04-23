@@ -2,7 +2,7 @@ import * as React from "react";
 import API from './API';
 import { format } from "date-fns/esm";
 
-export class DataPage extends React.Component {
+export default class DataPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -12,9 +12,9 @@ export class DataPage extends React.Component {
 
     getURL = async () => {
         try {
-            const a = await API.get('/subscribe', { headers: { "x-test-app-jwt-token": localStorage.getItem('SPAToken') } });
-            let socket = new WebSocket(a.data.url);
-            this.setState({ url: a.data.url, socket: socket });
+            const subscribeRes = await API.get('/subscribe', { headers: { "x-test-app-jwt-token": localStorage.getItem('SPAToken') } });
+            const socket = new WebSocket(subscribeRes.data.url);
+            this.setState({ url: subscribeRes.data.url, socket: socket });
         } catch (error) {
             this.props.logout();
         }
