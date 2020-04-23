@@ -8,7 +8,7 @@ export class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLogin: localStorage.getItem('SPAToken') ? true : false
+      isLogin: localStorage.getItem('SPAToken')
     };
   }
 
