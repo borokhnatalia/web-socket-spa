@@ -17,10 +17,6 @@ export default class DataPage extends React.Component {
     this.connectSoket();
   };
 
-  componentWillUnmount = () => {
-    this.socket.close();
-  };
-
   connectSoket = async () => {
     try {
       const subscribeRes = await API.get('/subscribe', {
