@@ -2,6 +2,8 @@ import * as React from "react";
 import API from '../api';
 import { format } from "date-fns/esm";
 
+let socket;
+
 export default class DataPage extends React.Component {
     constructor(props) {
         super(props);
@@ -16,20 +18,20 @@ export default class DataPage extends React.Component {
         this.connectSoket();
     }
 
-    // componentWillUnmount = () => {
-    //     socket.close();
-    // }
+    componentWillUnmount = () => {
+        socket.close();
+    }
 
     connectSoket = async () => {
         try {
             const subscribeRes = await API.get('/subscribe', { headers: { "x-test-app-jwt-token": this.props.token } });
-            const socket = new WebSocket(subscribeRes.data.url);
+            socket = new WebSocket(subscribeRes.data.url);
             socket.onopen = () => {
                 this.setState({ isConnect: true, error: false });
             }
             socket.onmessage = (message) => {
                 try {
-                    const newDate = format(new Date(JSON.parse(message.data)["server_time"]  * 1000), "dd-LL-yy HH:mm:ss");
+                    const newDate = format(new Date(JSON.parse(message.data)["server_time"] * 1000), "dd-LL-yy HH:mm:ss");
                     this.setState({ date: newDate });
                 } catch (error) {
                     this.setState({ errorMessage: error.description, error: true });
@@ -37,10 +39,12 @@ export default class DataPage extends React.Component {
             }
             socket.onerror = (error) => {
                 this.setState({ errorMessage: error.description, error: true });
+                socket.close();
                 this.connectSoket();
             }
             socket.onclose = () => {
                 this.setState({ isConnect: false });
+                socket.close();
                 this.connectSoket();
             }
         } catch (error) {

@@ -11,7 +11,8 @@ export default class App extends React.Component {
       token: localStorage.getItem('SPAToken'),
       isLoading: false,
       error: false,
-      errorMessage: ""
+      errorMessage: "",
+      loginTry: 0
     };
   }
 
@@ -22,12 +23,17 @@ export default class App extends React.Component {
         username, password
       });
       localStorage.setItem("SPAToken", res.headers["x-test-app-jwt-token"]);
-      this.setState({ token: res.headers["x-test-app-jwt-token"], error: false, isLoading: false });
+      this.setState({ token: res.headers["x-test-app-jwt-token"], error: false, isLoading: false, loginTry: 0 });
     } catch (error) {
-      if (error.message.includes('401')) {
-        this.setState({ error: true, errorMessage: error.response.data.description, isLoading: false });
+      if (error.message.includes('500')) {
+        if (this.state.loginTry < 3) {
+          this.setState({ isLoading: true, loginTry: this.state.loginTry + 1 });
+          this.handleCheckLogin(username, password);
+        } else {
+          this.setState({ errorMessage: error.response.data.description, error: true, isLoading: false, loginTry: 0 });
+        }
       } else {
-        this.setState({ errorMessage: error.response.data.description, error: true, isLoading: false });
+        this.setState({ error: true, errorMessage: error.response.data.description, isLoading: false, loginTry: 0 });
       }
     }
   }

@@ -17,7 +17,7 @@ export default class LogIn extends React.Component {
     }
 
     handleKeyPress = (e) => {
-        if (e.keyCode === 13 && e.currentTarget.name==="password") {
+        if (e.keyCode === 13 && e.currentTarget.name === "password") {
             this.props.handleCheckLogin(this.state.username, this.state.password);
         }
     }
@@ -28,14 +28,14 @@ export default class LogIn extends React.Component {
             <div className="login-container">
                 <div className="login-input-container">
                     <LoginInput
-                        error={this.state.error}
+                        error={this.props.error}
                         field="Username"
                         type="text"
                         value={this.state.username}
                         handleKeyPress={this.handleKeyPress}
                         handleChangeInput={this.handleChangeInput} />
                     <LoginInput
-                        error={this.state.error}
+                        error={this.props.error}
                         field="Password"
                         type="password"
                         value={this.state.password}
