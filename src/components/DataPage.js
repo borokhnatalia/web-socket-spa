@@ -1,50 +1,51 @@
 import * as React from "react";
-import API from './API';
+import API from '../api';
 import { format } from "date-fns/esm";
 
 export default class DataPage extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
+            isConnect: false,
+            error: false,
+            errorMessage: ""
         };
     }
 
-    getURL = async () => {
+    componentDidMount = () => {
+        this.connectSoket();
+    }
+
+    // componentWillUnmount = () => {
+    //     socket.close();
+    // }
+
+    connectSoket = async () => {
         try {
-            const subscribeRes = await API.get('/subscribe', { headers: { "x-test-app-jwt-token": localStorage.getItem('SPAToken') } });
+            const subscribeRes = await API.get('/subscribe', { headers: { "x-test-app-jwt-token": this.props.token } });
             const socket = new WebSocket(subscribeRes.data.url);
-            this.setState({ url: subscribeRes.data.url, socket: socket });
+            socket.onopen = () => {
+                this.setState({ isConnect: true, error: false });
+            }
+            socket.onmessage = (message) => {
+                try {
+                    const newDate = format(new Date(JSON.parse(message.data)["server_time"]  * 1000), "dd-LL-yy HH:mm:ss");
+                    this.setState({ date: newDate });
+                } catch (error) {
+                    this.setState({ errorMessage: error.description, error: true });
+                }
+            }
+            socket.onerror = (error) => {
+                this.setState({ errorMessage: error.description, error: true });
+                this.connectSoket();
+            }
+            socket.onclose = () => {
+                this.setState({ isConnect: false });
+                this.connectSoket();
+            }
         } catch (error) {
             this.props.logout();
         }
-    }
-
-    componentDidMount = async () => {
-        await this.getURL();
-    }
-
-
-    componentDidUpdate = async () => {
-        const { socket } = this.state;
-        socket.onopen = () => {
-            this.setState({ isConnect: true, error: false });
-        }
-        socket.onmessage = (message) => {
-            this.setState({ date: format(new Date(message.data.substr(15, message.data.length - 16) * 1000), "dd-LL-yy HH:mm:ss") });
-        }
-        socket.onerror = (error) => {
-            this.setState({ errorMessage: error.message, error: true })
-            this.getURL();
-        }
-        socket.onclose = () => {
-            this.setState({ isConnect: false });
-            this.getURL();
-        }
-    }
-
-    componentWillUnmount = () => {
-        this.state.socket.close();
     }
 
     render() {
